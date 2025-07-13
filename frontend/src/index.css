@@ -221,6 +221,46 @@ button:hover {
   background: #f0f4f8;
 }
 
+.user-form input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+}
+.user-form button {
+  margin-top: 8px;
+  padding: 8px 20px;
+  background: #0d6efd;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+/* === admin user table === */
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.user-table th,
+.user-table td {
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.user-table tbody tr:nth-child(even) {
+  background: #eef6ff;           /* light zebra stripe */
+}
+
+.user-table tbody tr:hover {
+  background: #d9ecff;           /* hover highlight */
+}
+
+.user-table th {
+  border-bottom: 2px solid #90c2ff;
+}
+
 
 .profile-button:hover {
   background: #005fa3;

@@ -11,10 +11,17 @@ from pymongo import MongoClient
 from bson import ObjectId
 import os
 from werkzeug.utils import secure_filename
+from flask import request, jsonify, g
+from bson import ObjectId
+from services import user_service
+from functools import wraps
+
 
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
+CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
+
 # create instances of services
 user_service = UserService()
 book_service = BookService()
@@ -36,6 +43,31 @@ ALLOWED_EXT = {"png", "jpg", "jpeg", "gif"}
 
 def allowed_file(fname):
     return "." in fname and fname.rsplit(".", 1)[1].lower() in ALLOWED_EXT
+
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not g.current_user or g.current_user.get("user_type") != "librarian":
+            return jsonify({"error": "Admin only"}), 403
+        return f(*args, **kwargs)
+    return wrapper
+
+from flask import session
+
+@app.before_request
+def load_current_user():
+    """
+    Middleware that sets g.current_user from a header (or session, cookie, etc.)
+    This is a placeholder. Replace with real session-based auth in production.
+    """
+    user_id = request.headers.get("X-User-Id")  # sent from frontend
+    if user_id:
+        user = users_col.find_one({"_id": ObjectId(user_id)})
+        if user:
+            user["_id"] = str(user["_id"])
+            g.current_user = user
+            return  # OK
+    g.current_user = None
 
 # ------------------ USER ROUTES ------------------
 @app.route('/api/users/login', methods=['POST'])
@@ -72,6 +104,59 @@ def get_user(user_id):
         return jsonify(user)
     except Exception as e:
         return jsonify({"error": str(e)}), 404
+
+@app.route("/api/admin/users", methods=["GET"])
+@admin_required
+def api_list_users():
+    """
+    Return every user document except the password field.
+    Called by the React admin table.
+    """
+    users = list(users_col.find({}, {"password": 0}))
+    for u in users:
+        u["_id"] = str(u["_id"])          # make ObjectId JSON-friendly
+    return jsonify(users)
+
+@app.route("/api/admin/users", methods=["POST"])
+@admin_required
+def api_create_user():
+    data = request.json or {}
+    try:
+        username   = data["username"].strip()
+        email      = data["email"].strip()
+        password   = data["password"]
+        full_name  = data.get("full_name", "")
+
+        if users_col.find_one({"username": username}):
+            return jsonify({"error": "Username already exists"}), 400
+
+        user_doc = {
+            "username":  username,
+            "email":     email,
+            "password":  password,               # 🔓 stored in plain text
+            "full_name": full_name,
+            "user_type": "regular",              # always regular
+            "created_at": datetime.utcnow()
+        }
+        result = users_col.insert_one(user_doc)
+        return jsonify({"user_id": str(result.inserted_id)}), 201
+
+    except (KeyError, ValueError) as e:
+        return jsonify({"error": str(e)}), 400
+
+
+@app.route("/api/admin/users/<user_id>", methods=["DELETE"])
+@admin_required
+def api_delete_user(user_id):
+    """
+    Delete a regular user.  Prevent deleting librarians.
+    """
+    res = users_col.delete_one(
+        {"_id": ObjectId(user_id), "user_type": {"$ne": "librarian"}}
+    )
+    if res.deleted_count:
+        return "", 204
+    return jsonify({"error": "User not found or cannot delete librarian"}), 404
 
 # ------------------ BOOK ROUTES ------------------
 
