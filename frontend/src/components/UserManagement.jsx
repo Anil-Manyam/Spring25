@@ -1,11 +1,28 @@
 // src/components/UserManagement.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = "http://127.0.0.1:5000";
-const currentUser = JSON.parse(localStorage.getItem("user"));   // ← get user_id once
-const AUTH_HEADER = { "X-User-Id": currentUser.user_id };
 
 export default function UserManagement() {
+  /* -------- auth helper -------- */
+  const navigate = useNavigate();
+  const stored = localStorage.getItem("user");
+  const currentUser = stored ? JSON.parse(stored) : null;
+  const user_id = currentUser?.user_id;
+  const isLibrarian = currentUser?.user_type === "librarian";
+
+  /* if not authorised, bail out (or redirect) */
+  useEffect(() => {
+    if (!isLibrarian) {
+      navigate("/login");              // <-- you can change this target
+    }
+  }, []);
+
+  /* headers used on every request when authorised */
+  const AUTH_HEADER = user_id ? { "X-User-Id": user_id } : {};
+
+  /* ---------------------------------- state ---------------------------------- */
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
     username: "",
@@ -14,29 +31,26 @@ export default function UserManagement() {
     fullName: ""
   });
 
-  /* -------- fetch users on mount -------- */
+  /* ---------------- fetch users on mount ---------------- */
   useEffect(() => {
-    refresh();
-  }, []);
+    if (isLibrarian) refresh();
+  }, [isLibrarian]);          // run only when authorised
 
   const refresh = () =>
-    fetch(`${API_BASE}/api/admin/users`, {
-      headers: AUTH_HEADER
-    })
+    fetch(`${API_BASE}/api/admin/users`, { headers: AUTH_HEADER })
       .then(r => r.json())
       .then(setUsers)
       .catch(() => setUsers([]));
 
-  /* -------- create user -------- */
+  /* ---------------- create user ---------------- */
   const createUser = async e => {
     e.preventDefault();
+    if (!isLibrarian) return;
+
     try {
       const res = await fetch(`${API_BASE}/api/admin/users`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...AUTH_HEADER
-        },
+        headers: { "Content-Type": "application/json", ...AUTH_HEADER },
         body: JSON.stringify({
           username: form.username,
           email: form.email,
@@ -54,9 +68,9 @@ export default function UserManagement() {
     }
   };
 
-  /* -------- delete user -------- */
+  /* ---------------- delete user ---------------- */
   const deleteUser = async id => {
-    if (!window.confirm("Delete this user?")) return;
+    if (!window.confirm("Delete this user?") || !isLibrarian) return;
     try {
       const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
         method: "DELETE",
@@ -72,7 +86,9 @@ export default function UserManagement() {
     }
   };
 
-  /* -------- UI -------- */
+  /* ---------------- UI ---------------- */
+  if (!isLibrarian) return null;           // nothing to render for non-admins
+
   return (
     <section style={{ marginTop: "40px" }}>
       <h3>User Management</h3>
