@@ -1,29 +1,28 @@
-// // src/components/UserManagement.jsx
+
 // import React, { useEffect, useState } from "react";
 // import { useNavigate } from "react-router-dom";
 
 // const API_BASE = "http://127.0.0.1:5000";
 
 // export default function UserManagement() {
-//   /* -------- auth helper -------- */
+//   /* ---------- auth helper ---------- */
 //   const navigate = useNavigate();
 //   const stored = localStorage.getItem("user");
 //   const currentUser = stored ? JSON.parse(stored) : null;
 //   const user_id = currentUser?.user_id;
 //   const isLibrarian = currentUser?.user_type === "librarian";
 
-//   /* if not authorised, bail out (or redirect) */
+//   /* redirect non-librarians */
 //   useEffect(() => {
-//     if (!isLibrarian) {
-//       navigate("/login");              // <-- you can change this target
-//     }
+//     if (!isLibrarian) navigate("/login");
 //   }, []);
 
-//   /* headers used on every request when authorised */
+//   /* request header */
 //   const AUTH_HEADER = user_id ? { "X-User-Id": user_id } : {};
 
-//   /* ---------------------------------- state ---------------------------------- */
-//   const [users, setUsers] = useState([]);
+//   /* ---------- state ---------- */
+//   const [users, setUsers]   = useState([]);
+//   const [loans, setLoans]   = useState([]);        // NEW
 //   const [form, setForm] = useState({
 //     username: "",
 //     email: "",
@@ -31,18 +30,28 @@
 //     fullName: ""
 //   });
 
-//   /* ---------------- fetch users on mount ---------------- */
-//   useEffect(() => {
-//     if (isLibrarian) refresh();
-//   }, [isLibrarian]);          // run only when authorised
-
-//   const refresh = () =>
+//   /* ---------- data fetch helpers ---------- */
+//   const fetchUsers = () =>
 //     fetch(`${API_BASE}/api/admin/users`, { headers: AUTH_HEADER })
 //       .then(r => r.json())
 //       .then(setUsers)
 //       .catch(() => setUsers([]));
 
-//   /* ---------------- create user ---------------- */
+//   const fetchLoans = () =>                     // NEW
+//     fetch(`${API_BASE}/api/loans/all`, { headers: AUTH_HEADER })
+//       .then(r => r.json())
+//       .then(setLoans)
+//       .catch(() => setLoans([]));
+
+//   /* fetch on mount */
+//   useEffect(() => {
+//     if (isLibrarian) {
+//       fetchUsers();
+//       fetchLoans();                             // NEW
+//     }
+//   }, [isLibrarian]);
+
+//   /* ---------- create user ---------- */
 //   const createUser = async e => {
 //     e.preventDefault();
 //     if (!isLibrarian) return;
@@ -53,7 +62,7 @@
 //         headers: { "Content-Type": "application/json", ...AUTH_HEADER },
 //         body: JSON.stringify({
 //           username: form.username,
-//           email: form.email,
+//           email:    form.email,
 //           password: form.password,
 //           full_name: form.fullName
 //         })
@@ -62,13 +71,13 @@
 //       if (!res.ok) return alert(data.error || "Create failed");
 //       alert("User created");
 //       setForm({ username: "", email: "", password: "", fullName: "" });
-//       refresh();
+//       fetchUsers();
 //     } catch {
 //       alert("Server error");
 //     }
 //   };
 
-//   /* ---------------- delete user ---------------- */
+//   /* ---------- delete user ---------- */
 //   const deleteUser = async id => {
 //     if (!window.confirm("Delete this user?") || !isLibrarian) return;
 //     try {
@@ -76,7 +85,7 @@
 //         method: "DELETE",
 //         headers: AUTH_HEADER
 //       });
-//       if (res.ok) refresh();
+//       if (res.ok) fetchUsers();
 //       else {
 //         const data = await res.json();
 //         alert(data.error || "Delete failed");
@@ -86,8 +95,8 @@
 //     }
 //   };
 
-//   /* ---------------- UI ---------------- */
-//   if (!isLibrarian) return null;           // nothing to render for non-admins
+//   /* ---------- UI ---------- */
+//   if (!isLibrarian) return null;
 
 //   return (
 //     <section style={{ marginTop: "40px" }}>
@@ -123,19 +132,15 @@
 //         <button>Create User</button>
 //       </form>
 
-//       {/* list all users */}
+//       {/* users table */}
 //       <table className="user-table">
 //         <thead>
 //           <tr>
-//             <th>Username</th>
-//             <th>Email</th>
-//             <th>Full Name</th>
-//             <th>Role</th>
-//             <th />
+//             <th>Username</th><th>Email</th><th>Full Name</th><th>Role</th><th />
 //           </tr>
 //         </thead>
 //         <tbody>
-//           {Array.isArray(users) && users.map(u => (
+//           {users.map(u => (
 //             <tr key={u._id} style={{ borderTop: "1px solid #ccc" }}>
 //               <td>{u.username}</td>
 //               <td>{u.email}</td>
@@ -155,6 +160,20 @@
 //           ))}
 //         </tbody>
 //       </table>
+
+//       {/* ---------- current borrowers ---------- */}
+//       <h4 style={{ marginTop: "35px" }}>Current Borrowers</h4>
+//       {loans.length === 0 ? (
+//         <p>No books are currently borrowed.</p>
+//       ) : (
+//         loans.map(l => (
+//           <div key={l.book_id + l.borrow_date}>
+//             {l.title} (ISBN {l.isbn}) — User: {l.username} — Borrowed:&nbsp;
+//             {new Date(l.borrow_date).toLocaleDateString()} — Due:&nbsp;
+//             {new Date(l.due_date).toLocaleDateString()}
+//           </div>
+//         ))
+//       )}
 //     </section>
 //   );
 // }
@@ -168,55 +187,39 @@ const API_BASE = "http://127.0.0.1:5000";
 export default function UserManagement() {
   /* ---------- auth helper ---------- */
   const navigate = useNavigate();
-  const stored = localStorage.getItem("user");
-  const currentUser = stored ? JSON.parse(stored) : null;
-  const user_id = currentUser?.user_id;
-  const isLibrarian = currentUser?.user_type === "librarian";
+  const stored       = localStorage.getItem("user");
+  const currentUser  = stored ? JSON.parse(stored) : null;
+  const user_id      = currentUser?.user_id;
+  const isLibrarian  = currentUser?.user_type === "librarian";
 
-  /* redirect non-librarians */
-  useEffect(() => {
-    if (!isLibrarian) navigate("/login");
-  }, []);
+  useEffect(() => { if (!isLibrarian) navigate("/login"); }, []);
 
-  /* request header */
   const AUTH_HEADER = user_id ? { "X-User-Id": user_id } : {};
 
   /* ---------- state ---------- */
-  const [users, setUsers]   = useState([]);
-  const [loans, setLoans]   = useState([]);        // NEW
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    fullName: ""
+  const [users, setUsers] = useState([]);
+  const [loans, setLoans] = useState([]);
+  const [form, setForm]   = useState({
+    username: "", email: "", password: "", fullName: ""
   });
 
   /* ---------- data fetch helpers ---------- */
   const fetchUsers = () =>
     fetch(`${API_BASE}/api/admin/users`, { headers: AUTH_HEADER })
-      .then(r => r.json())
-      .then(setUsers)
-      .catch(() => setUsers([]));
+      .then(r => r.json()).then(setUsers).catch(() => setUsers([]));
 
-  const fetchLoans = () =>                     // NEW
+  const fetchLoans = () =>
     fetch(`${API_BASE}/api/loans/all`, { headers: AUTH_HEADER })
-      .then(r => r.json())
-      .then(setLoans)
-      .catch(() => setLoans([]));
+      .then(r => r.json()).then(setLoans).catch(() => setLoans([]));
 
   /* fetch on mount */
   useEffect(() => {
-    if (isLibrarian) {
-      fetchUsers();
-      fetchLoans();                             // NEW
-    }
+    if (isLibrarian) { fetchUsers(); fetchLoans(); }
   }, [isLibrarian]);
 
   /* ---------- create user ---------- */
   const createUser = async e => {
     e.preventDefault();
-    if (!isLibrarian) return;
-
     try {
       const res = await fetch(`${API_BASE}/api/admin/users`, {
         method: "POST",
@@ -233,27 +236,19 @@ export default function UserManagement() {
       alert("User created");
       setForm({ username: "", email: "", password: "", fullName: "" });
       fetchUsers();
-    } catch {
-      alert("Server error");
-    }
+    } catch { alert("Server error"); }
   };
 
   /* ---------- delete user ---------- */
   const deleteUser = async id => {
-    if (!window.confirm("Delete this user?") || !isLibrarian) return;
+    if (!window.confirm("Delete this user?")) return;
     try {
-      const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
-        method: "DELETE",
-        headers: AUTH_HEADER
+      const res  = await fetch(`${API_BASE}/api/admin/users/${id}`, {
+        method: "DELETE", headers: AUTH_HEADER
       });
       if (res.ok) fetchUsers();
-      else {
-        const data = await res.json();
-        alert(data.error || "Delete failed");
-      }
-    } catch {
-      alert("Server error");
-    }
+      else alert((await res.json()).error || "Delete failed");
+    } catch { alert("Server error"); }
   };
 
   /* ---------- UI ---------- */
@@ -265,39 +260,25 @@ export default function UserManagement() {
 
       {/* create-user form */}
       <form onSubmit={createUser} className="user-form">
-        <input
-          placeholder="Username"
-          required
-          value={form.username}
-          onChange={e => setForm({ ...form, username: e.target.value })}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          value={form.email}
-          onChange={e => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          value={form.password}
-          onChange={e => setForm({ ...form, password: e.target.value })}
-        />
-        <input
-          placeholder="Full Name"
-          value={form.fullName}
-          onChange={e => setForm({ ...form, fullName: e.target.value })}
-        />
+        <input placeholder="Username" value={form.username} required
+               onChange={e => setForm({ ...form, username: e.target.value })}/>
+        <input type="email" placeholder="Email" value={form.email} required
+               onChange={e => setForm({ ...form, email: e.target.value })}/>
+        <input type="password" placeholder="Password" value={form.password} required
+               onChange={e => setForm({ ...form, password: e.target.value })}/>
+        <input placeholder="Full Name" value={form.fullName}
+               onChange={e => setForm({ ...form, fullName: e.target.value })}/>
         <button>Create User</button>
       </form>
 
-      {/* users table */}
+      {/* users table (no full-name column) */}
       <table className="user-table">
         <thead>
           <tr>
-            <th>Username</th><th>Email</th><th>Full Name</th><th>Role</th><th />
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -305,7 +286,6 @@ export default function UserManagement() {
             <tr key={u._id} style={{ borderTop: "1px solid #ccc" }}>
               <td>{u.username}</td>
               <td>{u.email}</td>
-              <td>{u.full_name}</td>
               <td>{u.user_type}</td>
               <td>
                 {u.user_type !== "librarian" && (
@@ -322,7 +302,7 @@ export default function UserManagement() {
         </tbody>
       </table>
 
-      {/* ---------- current borrowers ---------- */}
+      {/* current borrowers */}
       <h4 style={{ marginTop: "35px" }}>Current Borrowers</h4>
       {loans.length === 0 ? (
         <p>No books are currently borrowed.</p>

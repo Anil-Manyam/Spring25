@@ -1,5 +1,9 @@
-// import React, { useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
+
+
+
+
+// import React, { useEffect, useState } from "react";
+// import { useNavigate, Link } from "react-router-dom";
 
 // export default function RegisterPage() {
 //   const [username, setUsername] = useState("");
@@ -7,6 +11,11 @@
 //   const [password, setPassword] = useState("");
 //   const [confirmPassword, setConfirmPassword] = useState("");
 //   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     document.body.className = "register-page";
+//     return () => { document.body.className = ""; }
+//   }, []);
 
 //   const handleRegister = async (e) => {
 //     e.preventDefault();
@@ -21,7 +30,7 @@
 //         alert(data.error);
 //       } else {
 //         alert("Registration successful!");
-//         navigate("/");
+//         navigate("/login");
 //       }
 //     } catch {
 //       alert("Server error");
@@ -32,64 +41,49 @@
 //     <div className="container">
 //       <h2>Register</h2>
 //       <form onSubmit={handleRegister}>
-//         <input
-//           placeholder="Username"
-//           required
-//           value={username}
-//           onChange={e => setUsername(e.target.value)}
-//         />
-//         <input
-//           placeholder="Email"
-//           required
-//           value={email}
-//           onChange={e => setEmail(e.target.value)}
-//         />
-//         <input
-//           placeholder="Password"
-//           type="password"
-//           required
-//           value={password}
-//           onChange={e => setPassword(e.target.value)}
-//         />
-//         <input
-//           placeholder="Confirm Password"
-//           type="password"
-//           required
-//           value={confirmPassword}
-//           onChange={e => setConfirmPassword(e.target.value)}
-//         />
+//         <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
+//         <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+//         <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+//         <input placeholder="Confirm Password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
 //         <button type="submit">Register</button>
 //       </form>
-//       <p>Already have an account? <Link to="/">Login Here</Link></p>
+//       <p>Already have an account? <Link to="/login">Login here</Link></p>
 //     </div>
 //   );
 // }
 
-
-
-
+// src/pages/RegisterPage.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
+  const [fullName, setFullName] = useState("");      // NEW
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
+  /* page-specific body class */
   useEffect(() => {
     document.body.className = "register-page";
-    return () => { document.body.className = ""; }
+    return () => { document.body.className = ""; };
   }, []);
 
-  const handleRegister = async (e) => {
+  /* register handler */
+  const handleRegister = async e => {
     e.preventDefault();
     try {
       const res = await fetch("http://127.0.0.1:5000/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password, confirm_password: confirmPassword, email })
+        body: JSON.stringify({
+          username,
+          email,
+          full_name: fullName,                  // NEW
+          password,
+          confirm_password: confirmPassword
+        })
       });
       const data = await res.json();
       if (data.error) {
@@ -103,18 +97,51 @@ export default function RegisterPage() {
     }
   };
 
+  /* UI */
   return (
     <div className="container">
       <h2>Register</h2>
       <form onSubmit={handleRegister}>
-        <input placeholder="Username" value={username} onChange={e => setUsername(e.target.value)} required />
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-        <input placeholder="Confirm Password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+        <input
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        {/* NEW full-name field */}
+        <input
+          placeholder="Full Name"
+          value={fullName}
+          onChange={e => setFullName(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
+          required
+        />
         <button type="submit">Register</button>
       </form>
-      <p>Already have an account? <Link to="/login">Login here</Link></p>
+
+      <p>
+        Already have an account? <Link to="/login">Login here</Link>
+      </p>
     </div>
   );
 }
-
