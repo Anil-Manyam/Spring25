@@ -1,0 +1,491 @@
+/* === Global Styles === */
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  background: linear-gradient(135deg, #f0f4f8, #dbe9f4);
+  color: #333;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  color: #005fa3;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+a {
+  text-decoration: none;
+  color: #0077cc;
+}
+a:hover {
+  color: #005fa3;
+}
+
+p {
+  line-height: 1.6;
+}
+label {
+  font-weight: bold;
+}
+
+/* === Form Inputs === */
+input, select {
+  padding: 12px;
+  margin: 8px 0;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: #0077cc;
+  box-shadow: 0 0 5px rgba(0, 119, 204, 0.5);
+}
+
+/* === Buttons === */
+button {
+  padding: 8px 16px;
+  background: linear-gradient(90deg, #0077cc, #00b4db);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: background 0.3s, transform 0.2s;
+}
+button:hover {
+  background: linear-gradient(90deg, #005fa3, #0083b0);
+  transform: scale(1.05);
+}
+
+/* === Layout Containers === */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  padding: 20px;
+  background: #e6f2ff;
+  border-radius: 12px;
+  margin-top: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.content-area {
+  margin-left: 260px;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* === Sidebar === */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  background-color: #111827;
+  color: white;
+  padding: 24px 16px;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: width 0.3s ease;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #60a5fa;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: white;
+  font-size: 0.95rem;
+  padding: 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+}
+.nav-item:hover,
+.nav-item.active {
+  background-color: #1f2937;
+}
+
+/* Sidebar collapsed */
+.sidebar-collapsed {
+  width: 72px;
+}
+.sidebar-collapsed h2,
+.sidebar-collapsed .nav-item span {
+  display: none;
+}
+.sidebar-collapsed ~ .content-area {
+  margin-left: 72px;
+}
+/* === Sidebar Logout Styling === */
+.nav-item.logout-link {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+/* .nav-item.logout-link {
+  background: linear-gradient(90deg, #0077cc, #00b4db);
+  border: none;
+  width: 100%;
+  text-align: center;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+}
+
+.nav-item.logout-link:hover {
+  background: #dc2626; 
+}
+
+.sidebar-collapsed .logout-link span {
+  display: none;
+} */
+
+.nav-item.logout-link {
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: white;
+  transition: background-color 0.2s ease;
+}
+
+.nav-item.logout-link:hover {
+  background-color: #dc2626; /* 🔴 red hover */
+}
+
+/* Optional: prevent it from stretching in collapsed mode */
+.sidebar-collapsed .logout-link span {
+  display: none;
+}
+
+
+/* === Welcome Page === */
+.welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: linear-gradient(rgba(185, 232, 243, 0.6), rgba(60, 227, 102, 0.6)),
+    url("/public/images/0.jpg") center/cover no-repeat;
+  min-height: 100vh;
+  color: white;
+  text-align: center;
+}
+.welcome-buttons button {
+  margin: 10px;
+  padding: 12px 24px;
+  background: white;
+  color: #0083b0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+.welcome-buttons button:hover {
+  background: #f0f0f0;
+}
+
+/* === Profile Page === */
+.profile-form {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 40px 40px 40px 280px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  color: #222;
+  transition: margin-left 0.3s ease;
+}
+.profile-form h2 {
+  margin-top: 0;
+  color: #005fa3;
+  font-size: 1.8rem;
+}
+.logout-button {
+  background-color: #e3342f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #cc1f1a; /* darker red on hover */
+}
+
+/* === Book Card === */
+.borrowed-book-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-left: 4px solid #0077cc;
+}
+.borrowed-book-card h4 {
+  margin: 0 0 8px;
+  color: #005fa3;
+}
+.borrowed-book-card p {
+  margin: 2px 0;
+}
+.borrowed-book-card button {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  margin-top: 6px;
+}
+
+/* === Modal === */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 1001;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.book-image {
+  max-width: 200px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.review-box {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: #f9f9f9;
+}
+
+/* === fine page === */
+.fine-box {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 40px 40px 40px 280px; /* offset for sidebar */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  color: #222;
+  transition: margin-left 0.3s ease;
+}
+
+
+/* === user management page === */
+
+.user-management-form {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 40px 40px 40px 280px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  color: #222;
+  transition: margin-left 0.3s ease;
+}
+
+.user-management-form h2 {
+  margin-top: 0;
+  color: #005fa3;
+  font-size: 1.8rem;
+}
+
+/* Make table wrapper span full width and center contents */
+.user-table-wrapper {
+  width: 100%;
+  padding: 0 2rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Full-width table */
+.user-table-custom {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ccc;
+}
+
+/* Header styling */
+.user-table-custom th {
+  background-color: #cce4ff;
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+/* Body styling */
+.user-table-custom td {
+  padding: 12px;
+  border: 1px solid #ccc;
+}
+
+/* Alternate row background */
+.user-table-custom tr:nth-child(even) {
+  background-color: #e8f1ff;
+}
+
+.borrowers-title {
+  text-align: center;
+}
+
+
+
+/* === book management page === */
+
+.book-management-form {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 900px;
+  margin: 40px 40px 40px 280px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  color: #222;
+  transition: margin-left 0.3s ease;
+}
+
+.book-management-container {
+  background: rgba(255, 255, 255, 0.88);
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 1100px;
+  margin: 40px 40px 40px 280px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(4px);
+  color: #222;
+  transition: margin-left 0.3s ease;
+}
+
+.book-form-card {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.borrowed-book-card {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 4px solid #3b82f6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.borrowed-book-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+
+body.register-page {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  /* background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); */
+  background-image: url("/public/images/2.jpg");
+}
+
+body.login-page {
+  background-color: #f0f4f8;
+  /* background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); */
+  background-image: url("/public/images/4.jpg");
+}
+
+body.profile-page {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+  background-image: url("/public/images/3.jpg");
+}
+
+body.Fines-page {
+  background: linear-gradient(195deg, #fce4ec, #f8bbd0);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+  background-image: url("/public/images/6.jpg");
+}
+
+body.BookList-page {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+  background-image: url("/public/images/1.jpg");
+}
+body.UserManagement-page {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+  background-image: url("/public/images/7.jpg");
+}
+body.BookManagement-page {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  /* background-image: url("https://www.transparenttextures.com/patterns/asfalt-dark.png"); */
+  background-image: url("/public/images/8.jpg");
+}
