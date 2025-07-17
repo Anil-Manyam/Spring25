@@ -79,7 +79,7 @@ export default function LoginPage() {
 
       // 🔑 Persist the authenticated user so App.jsx sees it
       localStorage.setItem("user", JSON.stringify(data));
-      navigate("/home");
+      navigate("/profile");
     } catch (err) {
       console.error(err);
       alert("Server error. Please try again later.");

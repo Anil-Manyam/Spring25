@@ -5,7 +5,11 @@ import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
 import WelcomePage from "./pages/WelcomePage";
-
+import FinesPage from "./pages/FinesPage";
+import FeedbackPage from "./pages/FeedbackPage";
+import UserManagementPage from "./pages/UserManagementPage";
+import BookManagementPage from "./pages/BookManagementPage";
+import BookListPage from "./pages/BookListPage";
 
 export default function App() {
   return (
@@ -17,6 +21,11 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/welcome" element={<WelcomePage />} />
+        <Route path="/books" element={<BookListPage />} />
+        <Route path="/fines" element={<FinesPage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
+        <Route path="/admin/users" element={<UserManagementPage />} />
+        <Route path="/admin/books" element={<BookManagementPage />} />
       </Routes>
     </BrowserRouter>
   );
