@@ -1,9 +1,7 @@
-# tests/system/test_admin_user_creation.py
 from bson import ObjectId
 from unittest.mock import MagicMock
 import pytest
 from app import app
-
 
 @pytest.fixture
 def make_client(monkeypatch):
@@ -39,3 +37,4 @@ def test_admin_create_user_success(make_client):
         json={"username": "newu", "email": "n@x.com", "password": "pw"}
     )
     assert res.status_code == 201
+

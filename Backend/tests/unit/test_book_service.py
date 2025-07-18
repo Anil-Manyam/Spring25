@@ -1,41 +1,3 @@
-# import unittest, builtins
-# from unittest.mock import patch, MagicMock
-# from services import book_service as svc
-# from models import Book
-
-# class TestBookService(unittest.TestCase):
-#     def setUp(self):
-#         svc.books.clear()
-
-#     def test_add_book_basic(self):
-#         svc.add_book("DDD", "Evans", "111")
-#         self.assertEqual(len(svc.books), 1)
-
-#     def test_add_book_duplicate_isbn(self):
-#         svc.add_book("A", "B", "999")
-#         self.assertFalse(svc.add_book("C", "D", "999"))   # duplicate → False
-
-#     @patch("services.book_service.generate_id", return_value=77)
-#     def test_add_book_custom_id(self, mock_id):
-#         svc.add_book("X", "Y", "222")
-#         self.assertEqual(svc.books[0].book_id, 77)
-
-#     def test_get_book_by_id_found(self):
-#         b = svc.add_book("P", "Q", "555")
-#         self.assertIsNotNone(svc.get_book(b.book_id))
-
-#     def test_get_book_by_id_missing(self):
-#         self.assertIsNone(svc.get_book(1234))
-
-#     def test_delete_book_success(self):
-#         b = svc.add_book("Z", "Z", "321")
-#         self.assertTrue(svc.delete_book(b.book_id))
-#         self.assertEqual(len(svc.books), 0)
-
-#     def test_delete_book_fail(self):
-#         self.assertFalse(svc.delete_book(9999))
-
-
 import pytest
 from unittest.mock import MagicMock
 from services.book_service import BookService
@@ -46,7 +8,6 @@ def book_service(monkeypatch):
     mock_books_col = MagicMock()
     mock_feedback_col = MagicMock()
 
-    # Patch the books and feedback collections
     monkeypatch.setattr("services.book_service.books_col", mock_books_col)
     monkeypatch.setattr("services.book_service.feedback_col", mock_feedback_col)
 

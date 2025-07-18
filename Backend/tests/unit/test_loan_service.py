@@ -1,55 +1,3 @@
-# import unittest
-# from unittest.mock import patch
-# from Backend.services import loan_service as svc
-# from Backend.services import book_service, user_service
-
-# class TestLoanService(unittest.TestCase):
-#     def setUp(self):
-#         book_service.books.clear()
-#         user_service.users.clear()
-#         svc.loans.clear()
-#         # baseline data
-#         self.book = book_service.add_book("CLR", "PL", "cl1")
-#         self.user = user_service.register_user("ann", "regular")
-
-#     def test_borrow_book_success(self):
-#         self.assertTrue(svc.borrow_book(self.user.user_id, self.book.book_id))
-#         self.assertEqual(self.book.available, False)
-
-#     def test_borrow_book_no_stock(self):
-#         self.book.available = False
-#         self.assertFalse(svc.borrow_book(self.user.user_id, self.book.book_id))
-
-#     def test_borrow_book_over_limit(self):
-#         # borrow 3 quick dummy books
-#         for i in range(3):
-#             b = book_service.add_book(f"B{i}", "A", f"i{i}")
-#             svc.borrow_book(self.user.user_id, b.book_id)
-#         b4 = book_service.add_book("Last", "A", "ix")
-#         self.assertFalse(svc.borrow_book(self.user.user_id, b4.book_id))
-
-#     def test_return_book_success(self):
-#         svc.borrow_book(self.user.user_id, self.book.book_id)
-#         self.assertTrue(svc.return_book(self.user.user_id, self.book.book_id))
-
-#     def test_return_book_invalid(self):
-#         self.assertFalse(svc.return_book(self.user.user_id, 999))
-
-#     def test_calculate_fine_on_time(self):
-#         self.assertEqual(svc.calculate_fine("2099-01-01"), 0)
-
-#     def test_calculate_fine_late(self):
-#         self.assertGreater(svc.calculate_fine("2020-01-01"), 0)
-
-#     @patch("Backend.services.loan_service.calculate_fine", return_value=10)
-#     def test_return_book_with_fine(self, mock_fine):
-#         svc.borrow_book(self.user.user_id, self.book.book_id)
-#         paid = svc.return_book(self.user.user_id, self.book.book_id)
-#         self.assertTrue(paid)
-
-# tests/test_loan_service.py
-# tests/test_loan_service.py
-
 import pytest
 from unittest.mock import MagicMock
 from datetime import datetime
@@ -69,7 +17,6 @@ def mock_mongo_collections(monkeypatch):
     monkeypatch.setattr("services.loan_service.loans_col", loans_col)
     monkeypatch.setattr("services.loan_service.history_col", history_col)
     monkeypatch.setattr("services.loan_service.user_fines_col", user_fines_col)
-
     return {
         "books": books_col,
         "users": users_col,
@@ -78,24 +25,18 @@ def mock_mongo_collections(monkeypatch):
         "fines": user_fines_col,
     }
 
-
 @pytest.fixture
 def service():
     return LoanService()
 
-
 def test_borrow_book_success(mock_mongo_collections, monkeypatch, service):
     mocks = mock_mongo_collections
     monkeypatch.setattr("services.loan_service.get_user_outstanding_fine", lambda uid: 0)
-
     valid_user_id = "64dfc2e7d5d6f3d9c9e3b7a0"
     valid_book_id = "64dfc2e7d5d6f3d9c9e3b7b1"
-
     mocks["books"].find_one.return_value = {"_id": valid_book_id, "available": True, "title": "Test Book", "isbn": "123"}
     mocks["users"].find_one.return_value = {"_id": valid_user_id, "borrowed_books": []}
-
     service.borrow_book(valid_user_id, valid_book_id)
-
     mocks["books"].update_one.assert_called_once()
     mocks["users"].update_one.assert_called_once()
     mocks["loans"].insert_one.assert_called_once()
