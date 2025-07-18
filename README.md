@@ -21,10 +21,7 @@ A full-stack Library Management System built using **React**, **Flask**, and **M
 - **Frontend**: React, JavaScript, TailwindCSS  
 - **Backend**: Flask, Python  
 - **Database**: MongoDB  
-- **Testing**: Pytest, MagicMock  
 - **API**: RESTful API (Flask)
-
-
 
 ---
 
@@ -57,36 +54,6 @@ npm start
 
 ```
 React frontend will run on Locally: http://localhost:3000  and On Your Network:  http://10.0.0.173:3000
-
-----
-
-###  Running Test cases 
-
-Change your branch to **verification** by using below command:
-
-```bash
-git checkout verification
-```
-
-#### For unit test cases:
-
-```bash
-cd Backend
-python -m pytest tests/unit -v  
-```
-
-#### For System test cases:
-
-```bash
-cd Backend
-python -m pytest tests/system -v  
-```
-#### For all test cases at once:
-
-```bash
-cd Backend
-python -m pytest -v
-```
 
 
 ---
